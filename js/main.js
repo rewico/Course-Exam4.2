@@ -1,13 +1,18 @@
 const elForm = document.querySelector("form");
 const elInput = document.querySelector(".input");
+const elDivDetails = document.querySelector(".details");
 const elH2 = document.querySelector(".word");
 const elDivDefinitions = document.querySelector(".definitons");
+const elDivPlay = document.querySelector(".footer");
+const elBtnPlay = document.querySelector(".play");
+const elAudio = document.querySelector("audio");
 
-const seperateData = (element) => {
-  console.log(element.meanings);
-};
+elDivPlay.style.display = "none";
 
 const successRender = (data) => {
+  elDivDefinitions.innerHTML = "";
+  elDivDetails.style.display = "block";
+
   let word = data[0].word;
   let phonetic;
 
@@ -33,26 +38,43 @@ const successRender = (data) => {
 
     if (element.example) {
       let elPexample = document.createElement("p");
-      let elSpan = document.createElement("span");
 
       elPexample.className = "example";
-      elSpan.textContent = element.example;
       elPexample.textContent = `Example: ` + element.example;
 
       elDivDefinitions.appendChild(elPDef);
       elDivDefinitions.appendChild(elPexample);
-
-      console.log(elPexample);
     } else elDivDefinitions.appendChild(elPDef);
-    // console.log(element);
   });
 
-  // data.forEach(seperateData);
+  if (data[0]?.phonetics[0]?.audio) {
+    elDivPlay.style.display = "flex";
+
+    elAudio.setAttribute("src", `${data[0].phonetics[0].audio}`);
+    audio = elBtnPlay.addEventListener("click", () => {
+      elAudio.play();
+    });
+  } else elDivPlay.style.display = "none";
 };
 
 const errorRender = (data) => {
+  let elPDef = document.createElement("p");
+  let elPexample = document.createElement("p");
+
+  elDivDetails.style.display = "block";
+  elDivPlay.style.display = "none";
+
   elH2.textContent = data.title;
-  console.log(data);
+  elDivDefinitions.innerHTML = null;
+
+  elPDef.className = "desc";
+  elPexample.className = "example";
+
+  elPDef.textContent = data.message;
+  elPexample.textContent = data.resolution;
+
+  elDivDefinitions.appendChild(elPDef);
+  elDivDefinitions.appendChild(elPexample);
 };
 
 const render = (evt) => {
@@ -64,9 +86,9 @@ const render = (evt) => {
     );
     const DATA = await RES.json();
 
-    if (RES.status === 200) {
+    if ((await RES.status) === 200) {
       successRender(await DATA);
-    } else if (RES.status === 404) {
+    } else if ((await RES.status) === 404) {
       errorRender(await DATA);
     }
   })();
