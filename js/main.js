@@ -28,7 +28,9 @@ const successRender = (data) => {
     }
   });
 
-  elH2.textContent = word + " - " + phonetic;
+  if (phonetic) {
+    elH2.textContent = word + " - " + phonetic;
+  } else elH2.textContent = word;
 
   data[0].meanings[0].definitions.forEach((element) => {
     let elPDef = document.createElement("p");
